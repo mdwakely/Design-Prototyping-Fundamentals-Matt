@@ -26,7 +26,7 @@ public class Manager : MonoBehaviour
     public Canvas pauseMenu;
     public HighScores highScores;
     public GameObject manager;
-
+    public AudioSource theme;
 
     private void Start()
     {
@@ -55,9 +55,11 @@ public class Manager : MonoBehaviour
                     Time.timeScale = 0;
                     inGameCanvas.enabled = false;
                     pauseMenu.enabled = true;
+                    theme.Pause();
                 }
             }
         }
+        
         
     }
 
@@ -65,11 +67,11 @@ public class Manager : MonoBehaviour
     {
 
         Time.timeScale = 1;
-        timeLeft = 30f;
+        
         readyGo.text = "Ready...";
         readyGo.enabled = true;
         Debug.Log("ready text working");
-        timerText.text = "30:00";
+        timerText.text = timeLeft.ToString("F2");
         Debug.Log("timertext working");
         yield return new WaitForSeconds(3);
         Debug.Log("waitfor working");
@@ -98,7 +100,7 @@ public class Manager : MonoBehaviour
         ball.transform.position = new Vector3(0, 0, 1);
         Destroy(spawnGoal);
         Debug.Log("False working");
-        timeLeft = 30f;
+        timeLeft = timeLeft + 8f;
         Debug.Log("Timeleft working");
         SpawnGoal();
         StartCoroutine(GameStart());
@@ -154,6 +156,7 @@ public class Manager : MonoBehaviour
         scoreText.text = "Score: 0";
         inGameCanvas.enabled = true;
         StartCoroutine(GameStart());
+        theme.Play();
     }
 
     
@@ -162,6 +165,7 @@ public class Manager : MonoBehaviour
         Time.timeScale = 1;
         pauseMenu.enabled = false;
         inGameCanvas.enabled = true;
+        theme.Play();
     }
     public void ExitLevel()
     {
@@ -183,6 +187,7 @@ public class Manager : MonoBehaviour
         highScores.SaveScoresToFile();
         currentScore = 0;
         HighScoreList();
+        theme.Stop();
     }
 
     public void BackToMenu()
@@ -203,12 +208,14 @@ public class Manager : MonoBehaviour
 
     private IEnumerator GameOver()
     {
+        gameStarted = false;
         timerText.text = "00:00";
         player.GetComponent<ThirdPersonUserControl>().canMove = false;
         readyGo.text = "Game Over";
         readyGo.enabled = true;
         yield return new WaitForSeconds(3);
         ExitLevel();
+        theme.Stop();
         
 
     }
